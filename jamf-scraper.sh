@@ -47,10 +47,11 @@
 #
 # HISTORY
 #
-# v1.0 - 02/13/2023 - Initial WIP release to collect Computers, Devices, Jamf Accounts/Groups, 
-#                     Computer Groups, and Device Groups. - Jonathan Nelson
-# v1.1 - 02/15/2023 - Restructured scripts into fragments to allow for only running enabled reports
-#					  and specifying an output directory (defaults to current user's Desktop)
+# v0.1.0-a - 02/13/2023 - Initial WIP release to collect Computers, Devices, Jamf Accounts/Groups, 
+#                         Computer Groups, and Device Groups. - Jonathan Nelson
+# v0.2.0-a - 02/15/2023 - Restructured scripts into fragments to allow for only running enabled reports
+#					      and specifying an output directory (defaults to current user's Desktop). Also
+#					      added a Policies report.
 #
 ####################################################################################################
 #
