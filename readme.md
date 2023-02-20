@@ -10,12 +10,20 @@ as written will not modify anything in Jamf Pro, but it is always best to use pu
 as a precautionary measure.  It is NOT recommended to use any account with Create, Update, or Delete
 permissions.
 
-This scrip will make an API call for each object ID it finds.  In large environments this may result
+This script will make an API call for each object ID it finds.  In large environments this may result
 in hundreds or thousands of calls and will take a long time to complete.  Please be patient.
+
+# Prerequisits
+
+* Jamf Pro Account with Auditor or equivalent permissions
+* IBM Notifier (either in the same folder as the script or path specified in the IBMpath variable)
 
 # Instructions
 
-Download the latest version zip file and extract.  Before runninng, make sure to change the base_url to 
-your Jamf Pro server, change the credentials for your auditor API account, set an output directory (it
-will default to your Desktop folder), and uncomment the lines at the bottom which correspond to the reports
-you want to run.
+1. Download the latest version zip file
+2. Extract the zip and make all scripts executable. (sudo chmod -R +x ~/Downloads/Jamf-Scraper_version)
+3. Run jamf-scraper.sh
+4. Enter your Jamf Pro Server URL, API Username, API Password, and desired output path.
+5. Select which reports you want to run.
+6. Get Coffee
+7. Review Reports
