@@ -193,7 +193,7 @@ done
 
 if [ -z "$outputDirectory" ]; then
 # Prompt user for output directory
-IBMoutputDirectory="-type popup -silent -title \"Jamf Scraper\" -accessory_view_type input -accessory_view_payload \"/placeholder \"path/to/output\" /title Where would you like to save your reports? /subtitle Leave this field blank to default to your Desktop\" -main_button_label \"OK\""
+IBMoutputDirectory="-type popup -silent -title \"Jamf Scraper\" -accessory_view_type input -accessory_view_payload \"/placeholder Leave this field blank to default to your Desktop /title Where would you like to save your reports? \" -main_button_label \"OK\""
 	
 IBMcommand="$IBMpath $IBMoutputDirectory"
 	
