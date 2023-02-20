@@ -54,6 +54,7 @@
 # v0.3.0-a - 02/19/2023 - Implimented prompts for variable input and report selections with IBM Notifier
 # v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
 #                       - Added group memberships for computers and devices.
+#                       - Added Licensed Software Report
 #
 ####################################################################################################
 #
@@ -71,7 +72,6 @@
 #   * SMTP Servers
 #   * VPP Accounts
 #   * Distribution Points
-# - Licensed Software Report
 # - Mac Applications Report
 # - Configuration Profiles Report (Computers and Devices)
 # - Extension Attributes Report (Computers and Devices)
