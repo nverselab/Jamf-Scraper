@@ -52,13 +52,13 @@
 # v0.2.0-a - 02/15/2023 - Restructured scripts into fragments to allow for only running enabled reports
 #                         and specifying an output directory (defaults to current user's Desktop)
 # v0.3.0-a - 02/19/2023 - Implimented prompts for variable input and report selections with IBM Notifier
+# v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
+#                       - Added group memberships for computers and devices.
 #
 ####################################################################################################
 #
 # FUTURE FEATURE IDEAS
 #
-# - Regenerate report from local XML files instead of repull
-# - Combined Report View
 # - Server Configuration Summary
 #   * Sites
 #   * Categories
@@ -262,6 +262,81 @@ for i in "${selected_files[@]}"; do
 	sh ./fragments/${sh_files[$i]}.sh $parameters
 done
 
+###################
+# Combine Reports #
+###################
+
+# Set variables
+CSV_FOLDER="$outputDirectory/Reports"
+HTML_FILE="$outputDirectory/Reports/Combined-Report_$current_date.html"
+ROW_COLOR_1="#F4F6F9"
+ROW_COLOR_2="#FFFFFF"
+HEADER_COLOR="#333333"
+CELL_COLOR="#555555"
+HEADER_TEXT_COLOR="#FFFFFF"
+CELL_TEXT_COLOR="#000000"
+TABLE_LABEL_COLOR="maroon"
+
+# Create initial HTML file
+echo "<html><body style='color:$CELL_TEXT_COLOR'>" > $HTML_FILE
+
+# Add stylesheet to HTML file
+echo "<style>" >> $HTML_FILE
+echo "table {border-collapse: collapse; width: 100%;}" >> $HTML_FILE
+echo "th, td {text-align: left; padding: 8px;}" >> $HTML_FILE
+echo "th {background-color: $HEADER_COLOR; color: $HEADER_TEXT_COLOR;}" >> $HTML_FILE
+echo "tr:nth-child(even) {background-color: $ROW_COLOR_2; color: $CELL_TEXT_COLOR;}" >> $HTML_FILE
+echo "tr:nth-child(odd) {background-color: $ROW_COLOR_1; color: $CELL_TEXT_COLOR;}" >> $HTML_FILE
+echo "</style>" >> $HTML_FILE
+
+# Loop through CSV files
+for file in $CSV_FOLDER/*.csv
+do
+	# Get table label from filename
+	TABLE_LABEL=$(basename "$file" .csv)
+	
+	# Count number of rows in CSV file
+	NUM_ROWS=$(($(wc -l < "$file")-1))
+	
+	# Append row count to table label
+	TABLE_LABEL="$NUM_ROWS $TABLE_LABEL"
+	
+	# Add table header to HTML file
+	echo "<h2 style='color:$TABLE_LABEL_COLOR'>$TABLE_LABEL</h2>" >> $HTML_FILE
+	echo "<table>" >> $HTML_FILE
+	echo "<thead><tr>" >> $HTML_FILE
+	
+	# Loop through column headers and add to table
+	HEADERS=$(head -n 1 "$file")
+	IFS=',' read -r -a HEADER_ARRAY <<< "$HEADERS"
+	for header in "${HEADER_ARRAY[@]}"
+	do
+		echo "<th>$header</th>" >> $HTML_FILE
+	done
+	
+	# Add table body to HTML file
+	echo "</tr></thead>" >> $HTML_FILE
+	echo "<tbody>" >> $HTML_FILE
+	
+	# Loop through CSV file and add rows to table
+	while read line
+	do
+		echo "<tr style='color:$CELL_TEXT_COLOR; background-color:$ROW_COLOR_1;'><td>${line//,/</td><td>}</td></tr>" | sed 's/;/<br>/g'  >> $HTML_FILE
+		ROW_COLOR_TEMP=$ROW_COLOR_1
+		ROW_COLOR_1=$ROW_COLOR_2
+		ROW_COLOR_2=$ROW_COLOR_TEMP
+	done < <(tail -n +2 "$file")
+	
+	# Close the table
+	echo "</tbody></table>" >> $HTML_FILE
+done
+
+# Close the HTML file
+echo "</body></html>" >> $HTML_FILE
+
+echo "Done! HTML file created at $HTML_FILE"
+
+
 #####################
 # Completion Prompt #
 #####################
@@ -271,5 +346,6 @@ IBMcomplete="-type popup -title \"Jamf Scrape Complete\" -subtitle \"Click OK to
 IBMcommand="$IBMpath $IBMcomplete"
 complete=$(echo $IBMcommand | sh)
 open $outputDirectory/Reports
+
 
 exit 0
