@@ -10,8 +10,13 @@ as written will not modify anything in Jamf Pro, but it is always best to use pu
 as a precautionary measure.  It is NOT recommended to use any account with Create, Update, or Delete
 permissions.
 
-This scrip will make an API call for each object ID it finds.  In large environments this may result
+This script will make an API call for each object ID it finds.  In large environments this may result
 in hundreds or thousands of calls and will take a long time to complete.  Please be patient.
+
+# Prerequisits
+
+* Jamf Pro Account with Auditor or equivalent permissions
+* IBM Notifier (either in the same folder as the script or path specified in the IBMpath variable)
 
 # Instructions
 
