@@ -288,7 +288,7 @@ echo "a.menu-link { display: inline-block; color: $MENU_TEXT_COLOR; text-decorat
 echo ".menu { position: fixed; top: 0; left: 0; right: 0; height: $MENU_HEIGHT; background-color: $MENU_BACKGROUND_COLOR; z-index: 9999; display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;}" >> $HTML_FILE
 echo "table {border-collapse: collapse; width: 100%;}" >> $HTML_FILE
 echo "th, td {text-align: left; padding: 8px;}" >> $HTML_FILE
-echo "th {background-color: $HEADER_COLOR; color: $HEADER_TEXT_COLOR;}" >> $HTML_FILE
+echo "th {background-color: $HEADER_COLOR; color: $HEADER_TEXT_COLOR; position: sticky; top: 50;}" >> $HTML_FILE
 echo "tr:nth-child(even) {background-color: $ROW_COLOR_2; color: $CELL_TEXT_COLOR;}" >> $HTML_FILE
 echo "tr:nth-child(odd) {background-color: $ROW_COLOR_1; color: $CELL_TEXT_COLOR;}" >> $HTML_FILE
 echo "</style>" >> $HTML_FILE
