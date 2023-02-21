@@ -315,6 +315,13 @@ do
 	# Get table label from filename
 	TABLE_LABEL=$(basename "$file" .csv)
 	
+	# Count number of rows in CSV file
+	NUM_ROWS=$(($(wc -l < "$file")-1))
+	
+	# Append row count to table label
+	TABLE_LABEL="$NUM_ROWS $TABLE_LABEL"
+	
+	
 	# Add table header to HTML file
 	echo "<h2 style='color:$TABLE_LABEL_COLOR' id='$TABLE_LABEL'>$TABLE_LABEL</h2>" >> $HTML_FILE
 	echo "<table>" >> $HTML_FILE
