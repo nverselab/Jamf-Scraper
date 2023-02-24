@@ -54,6 +54,7 @@
 # v0.3.0-a - 02/19/2023 - Implimented prompts for variable input and report selections with IBM Notifier
 # v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
 #                       - Added group memberships for computers and devices.
+# v0.4.1*a * 02/24/2023 - Added Licesned and VPP/App Store Reports
 #
 ####################################################################################################
 #
@@ -71,13 +72,9 @@
 #   * SMTP Servers
 #   * VPP Accounts
 #   * Distribution Points
-# - Licensed Software Report
-# - Mac Applications Report
-# - Configuration Profiles Report (Computers and Devices)
 # - Extension Attributes Report (Computers and Devices)
 # - Packages Report
 # - Patch Management Report
-# - Inventory Preload Template Generator
 #
 ####################################################################################################
 
@@ -202,7 +199,7 @@ fi
 
 
 ################################################
-# Build IBM Notifier Reports Secelction Prompt #
+# Build IBM Notifier Reports Selection Prompt #
 ################################################
 
 # Find all .sh files in the fragments subdirectory
@@ -245,6 +242,7 @@ fi
 if [ ! -d "$outputDirectory" ]; then
 	mkdir "$outputDirectory"
 	mkdir "$outputDirectory/XML"
+	mkdir "$outputDirectory/CSV"
 	mkdir "$outputDirectory/Reports"
 fi
 
@@ -267,7 +265,7 @@ done
 ###################
 
 # Set variables
-CSV_FOLDER="$outputDirectory/Reports"
+CSV_FOLDER="$outputDirectory/CSV"
 HTML_FILE="$outputDirectory/Reports/Combined-Report_$current_date.html"
 ROW_COLOR_1="#F4F6F9"
 ROW_COLOR_2="#FFFFFF"
@@ -359,7 +357,7 @@ done
 # Completion Prompt #
 #####################
 
-# Let the user know everything is finished and ask to open the reports folder
+# Let the user know everything is finished and open the reports folder
 IBMcomplete="-type popup -title \"Jamf Scrape Complete\" -subtitle \"Click OK to open your reports directory.\" -main_button_label \"OK\""
 IBMcommand="$IBMpath $IBMcomplete"
 complete=$(echo $IBMcommand | sh)

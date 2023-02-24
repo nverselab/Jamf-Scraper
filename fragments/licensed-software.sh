@@ -28,6 +28,7 @@ current_date=$(date +%Y-%m-%d)
 if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory
 	mkdir $outputDirectory/XML
+	mkdir $outputDirectory/CSV
 	mkdir $outputDirectory/Reports
 fi
 
@@ -43,7 +44,7 @@ fi
 curl -H "Accept: application/xml" -u "$api_username:$api_password" "$licensedsoftwares_endpoint" | xmllint --format - > $outputDirectory/XML/licensed_software.xml
 
 # Create headers for the CSV file
-echo "Software Name,Publisher,Platform,Count Owned,Violation Email,Remove from Inventory Reports?,Exclude App Store?,Perpetual?,Expiration,Site,Computers,Notes" > $outputDirectory/Reports/licensed_software_$current_date.csv
+echo "Software Name,Publisher,Platform,Count Owned,Violation Email,Remove from Inventory Reports?,Exclude App Store?,Perpetual?,Expiration,Site,Computers,Notes" > $outputDirectory/CSV/licensed_software_$current_date.csv
 
 # Get a list of all licensedsoftware IDs
 licensedsoftware_ids=`xmllint --xpath "//licensed_software/id/text()" $outputDirectory/XML/licensed_software.xml | tr '\n' ' '`
@@ -78,6 +79,6 @@ for id in $licensedsoftware_ids; do
 	perpetual=`echo "$licensedsoftware_info" | xmllint --xpath "//licensed_software/licenses/license/purchasing/is_perpetual/text()" -`
 	site=`echo "$licensedsoftware_info" | xmllint --xpath "//licensed_software/general/site/name/text()" -`
 	count=`echo "$licensedsoftware_info" | xmllint --xpath "//licensed_software/licenses/license/license_count/text()" -`
-	echo "$licensedsoftware_name,$publisher,$platform,$count,$email,$removereports,$appstore,$perpetual,$expiration,$site,$computer_names,$notes" >> $outputDirectory/Reports/licensed_software_$current_date.csv
+	echo "$licensedsoftware_name,$publisher,$platform,$count,$email,$removereports,$appstore,$perpetual,$expiration,$site,$computer_names,$notes" >> $outputDirectory/CSV/licensed_software_$current_date.csv
 	echo $licensedsoftware_info | xmllint --format - > "$outputDirectory/XML/Licensed_Software/licensedsoftwareID_$id-$licensedsoftware_name.xml"
 done

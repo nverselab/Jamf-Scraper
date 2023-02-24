@@ -28,6 +28,7 @@ current_date=$(date +%Y-%m-%d)
 if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory
 	mkdir $outputDirectory/XML
+	mkdir $outputDirectory/CSV
 	mkdir $outputDirectory/Reports
 fi
 
@@ -43,7 +44,7 @@ fi
 curl -H "Accept: application/xml" -u "$api_username:$api_password" "$policies_endpoint" | xmllint --format - > $outputDirectory/XML/policies.xml
 
 # Create headers for the CSV file
-echo "Policy Name,Enabled?,Check-in?,Enroll Complete?,Login?,Startup?,Netstate Change?,EventID,Offline?,Category,Self Service?,Site,All Computers?,Computers,Computer Groups,Buildings,Departments" > $outputDirectory/Reports/policies_$current_date.csv
+echo "Policy Name,Enabled?,Check-in?,Enroll Complete?,Login?,Startup?,Netstate Change?,EventID,Offline?,Category,Self Service?,Site,All Computers?,Computers,Computer Groups,Buildings,Departments" > $outputDirectory/CSV/policies_$current_date.csv
 
 # Get a list of all policy IDs
 policy_ids=`xmllint --xpath "//policy/id/text()" $outputDirectory/XML/policies.xml | tr '\n' ' '`
@@ -69,6 +70,6 @@ for id in $policy_ids; do
 	buildings=`echo "$policy_info" | xmllint --xpath "//policy/scope/buildings/building/name/text()" - | tr '\n' ";" | tr "," " "`
 	departments=`echo "$policy_info" | xmllint --xpath "//policy/scope/departments/department/name/text()" - | tr '\n' ";" | tr "," " "`
 	selfservice=`echo "$policy_info" | xmllint --xpath "//policy/self_service/use_for_self_service/text()" -`
-	echo "$policy_name,$enabled,$checkin,$enrollment,$login,$startup,$netstate,$event,$offline,$category,$selfservice,$site,$all_computers,$computers,$computer_groups,$buildings,$departments" >> $outputDirectory/Reports/policies_$current_date.csv
+	echo "$policy_name,$enabled,$checkin,$enrollment,$login,$startup,$netstate,$event,$offline,$category,$selfservice,$site,$all_computers,$computers,$computer_groups,$buildings,$departments" >> $outputDirectory/CSV/policies_$current_date.csv
 	echo $policy_info | xmllint --format - > "$outputDirectory/XML/Policies/policyID_$id-$policy_name.xml"
 done
