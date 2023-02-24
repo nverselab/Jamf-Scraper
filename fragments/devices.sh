@@ -28,6 +28,7 @@ current_date=$(date +%Y-%m-%d)
 if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory
 	mkdir $outputDirectory/XML
+	mkdir $outputDirectory/CSV
 	mkdir $outputDirectory/Reports
 fi
 
@@ -43,7 +44,7 @@ fi
 curl -H "Accept: application/xml" -u "$api_username:$api_password" "$devices_endpoint" | xmllint --format - > $outputDirectory/XML/devices.xml
 
 # Create headers for the CSV file
-echo "Device Name,Serial Number,Model,User,Department,Building,Room,OS Version,Enrollment Method,Supervised,Last Inventory Update,Site" > $outputDirectory/Reports/devices_$current_date.csv
+echo "Device Name,Serial Number,Model,User,Department,Building,Room,OS Version,Enrollment Method,Supervised,Last Inventory Update,Site,Group Memberships" > $outputDirectory/CSV/devices_$current_date.csv
 
 # Get a list of all device IDs
 device_ids=`xmllint --xpath "//mobile_device/id/text()" $outputDirectory/XML/devices.xml | tr '\n' ' '`
@@ -64,6 +65,7 @@ for id in $device_ids; do
 	supervised=`echo "$device_info" | xmllint --xpath "//mobile_device/general/supervised/text()" -`
 	os_version=`echo "$device_info" | xmllint --xpath "//mobile_device/general/os_version/text()" -`
 	model=`echo "$device_info" | xmllint --xpath "//mobile_device/general/model/text()" - | tr "," " "` 
-	echo "$device_name,$serial_number,$model,$user,$department,$building,$room,$os_version,$enrollement_method,$supervised,$inventory_time,$site" >> $outputDirectory/Reports/devices_$current_date.csv
+	device_groups=`echo "$device_info" | xmllint --xpath "//mobile_device/mobile_device_groups/mobile_device_group/name/text()" - | tr '\n' ";" | tr "," " "`
+	echo "$device_name,$serial_number,$model,$user,$department,$building,$room,$os_version,$enrollement_method,$supervised,$inventory_time,$site,$device_groups" >> $outputDirectory/CSV/devices_$current_date.csv
 	echo $device_info | xmllint --format - > "$outputDirectory/XML/Devices/deviceID_$id-SN_$serial_number.xml"
 done

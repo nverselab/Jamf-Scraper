@@ -28,6 +28,7 @@ current_date=$(date +%Y-%m-%d)
 if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory
 	mkdir $outputDirectory/XML
+	mkdir $outputDirectory/CSV
 	mkdir $outputDirectory/Reports
 fi
 
@@ -43,7 +44,7 @@ fi
 curl -H "Accept: application/xml" -u "$api_username:$api_password" "$computergroups_endpoint" | xmllint --format - > $outputDirectory/XML/computer_groups.xml
 
 # Create headers for the CSV file
-echo "Group Name,Smart Group,Count,Site" > $outputDirectory/Reports/computer_groups_$current_date.csv
+echo "Group Name,Smart Group,Count,Site" > $outputDirectory/CSV/computer_groups_$current_date.csv
 
 # Get a list of all computer group IDs
 group_ids=`xmllint --xpath "//computer_group/id/text()" $outputDirectory/XML/computer_groups.xml | tr '\n' ' '`
@@ -56,6 +57,6 @@ for id in $group_ids; do
 	smart=`echo "$group_info" | xmllint --xpath "//computer_group/is_smart/text()" -`
 	count=`echo "$group_info" | xmllint --xpath "//computer_group/computers/size/text()" -`
 	site=`echo "$group_info" | xmllint --xpath "//computer_group/site/name/text()" -`
-	echo "$group_name,$smart,$count,$site" >> $outputDirectory/Reports/computer_groups_$current_date.csv
+	echo "$group_name,$smart,$count,$site" >> $outputDirectory/CSV/computer_groups_$current_date.csv
 	echo $group_info | xmllint --format - > "$outputDirectory/XML/Computer_Groups/groupID_$id-$group_name.xml"
 done

@@ -52,13 +52,14 @@
 # v0.2.0-a - 02/15/2023 - Restructured scripts into fragments to allow for only running enabled reports
 #                         and specifying an output directory (defaults to current user's Desktop)
 # v0.3.0-a - 02/19/2023 - Implimented prompts for variable input and report selections with IBM Notifier
+# v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
+#                       - Added group memberships for computers and devices.
+# v0.4.1*a * 02/24/2023 - Added Licesned and VPP/App Store Reports
 #
 ####################################################################################################
 #
 # FUTURE FEATURE IDEAS
 #
-# - Regenerate report from local XML files instead of repull
-# - Combined Report View
 # - Server Configuration Summary
 #   * Sites
 #   * Categories
@@ -71,13 +72,9 @@
 #   * SMTP Servers
 #   * VPP Accounts
 #   * Distribution Points
-# - Licensed Software Report
-# - Mac Applications Report
-# - Configuration Profiles Report (Computers and Devices)
 # - Extension Attributes Report (Computers and Devices)
 # - Packages Report
 # - Patch Management Report
-# - Inventory Preload Template Generator
 #
 ####################################################################################################
 
@@ -202,7 +199,7 @@ fi
 
 
 ################################################
-# Build IBM Notifier Reports Secelction Prompt #
+# Build IBM Notifier Reports Selection Prompt #
 ################################################
 
 # Find all .sh files in the fragments subdirectory
@@ -245,6 +242,7 @@ fi
 if [ ! -d "$outputDirectory" ]; then
 	mkdir "$outputDirectory"
 	mkdir "$outputDirectory/XML"
+	mkdir "$outputDirectory/CSV"
 	mkdir "$outputDirectory/Reports"
 fi
 
@@ -262,14 +260,108 @@ for i in "${selected_files[@]}"; do
 	sh ./fragments/${sh_files[$i]}.sh $parameters
 done
 
+###################
+# Combine Reports #
+###################
+
+# Set variables
+CSV_FOLDER="$outputDirectory/CSV"
+HTML_FILE="$outputDirectory/Reports/Combined-Report_$current_date.html"
+ROW_COLOR_1="#F4F6F9"
+ROW_COLOR_2="#FFFFFF"
+HEADER_COLOR="#333333"
+CELL_COLOR="#555555"
+HEADER_TEXT_COLOR="#FFFFFF"
+CELL_TEXT_COLOR="#000000"
+TABLE_LABEL_COLOR="#660600"
+MENU_BACKGROUND_COLOR="#660600"
+MENU_TEXT_COLOR="#FFF"
+MENU_HEIGHT="50px"
+
+# Create initial HTML file
+echo "<html><head>" > $HTML_FILE
+echo "<style>" >> $HTML_FILE
+echo "body { padding-top: calc($MENU_HEIGHT * 1.25); }" >> $HTML_FILE
+echo "a.menu-link { display: inline-block; color: $MENU_TEXT_COLOR; text-decoration: none; font-weight: bold; padding: 0 10px; line-height: 3; }" >> $HTML_FILE
+echo ".menu { position: fixed; top: 0; left: 0; right: 0; height: $MENU_HEIGHT; background-color: $MENU_BACKGROUND_COLOR; z-index: 9999; display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;}" >> $HTML_FILE
+echo "table {border-collapse: collapse; width: 100%;}" >> $HTML_FILE
+echo "th, td {text-align: left; padding: 8px;}" >> $HTML_FILE
+echo "th {background-color: $HEADER_COLOR; color: $HEADER_TEXT_COLOR; position: sticky; top: 50;}" >> $HTML_FILE
+echo "tr:nth-child(even) {background-color: $ROW_COLOR_2; color: $CELL_TEXT_COLOR;}" >> $HTML_FILE
+echo "tr:nth-child(odd) {background-color: $ROW_COLOR_1; color: $CELL_TEXT_COLOR;}" >> $HTML_FILE
+echo "</style>" >> $HTML_FILE
+echo "</head><body style='color:$CELL_TEXT_COLOR'>" >> $HTML_FILE
+
+# Add menu to HTML file
+echo "<div class='menu'>" >> $HTML_FILE
+echo "<a class='menu-link'>Jump to: </a>" >> $HTML_FILE
+for file in $CSV_FOLDER/*.csv
+do
+	TABLE_LABEL=$(basename "$file" .csv)
+	TABLE_LINKTEXT=`echo "${TABLE_LABEL}" | sed 's/...........$//'` # Remove the datestamp
+	echo "<a class='menu-link' href='#$TABLE_LABEL'>$TABLE_LINKTEXT</a>" >> $HTML_FILE
+done
+
+echo "</div>" >> $HTML_FILE
+
+# Add Title to HTML File
+echo "<h1 style='color:$CELL_TEXT_COLOR'>Jamf Scraper - Combined Report</h1>" >> $HTML_FILE
+
+# Loop through CSV files
+for file in $CSV_FOLDER/*.csv
+do
+	# Get table label from filename
+	TABLE_LABEL=$(basename "$file" .csv)
+	
+	# Count number of rows in CSV file
+	NUM_ROWS=$(($(wc -l < "$file")-1))
+	
+	# Append row count to table label
+	TABLE_LABEL="$NUM_ROWS $TABLE_LABEL"
+	
+	
+	# Add table header to HTML file
+	echo "<h2 style='color:$TABLE_LABEL_COLOR' id='$TABLE_LABEL'>$TABLE_LABEL</h2>" >> $HTML_FILE
+	echo "<table>" >> $HTML_FILE
+	echo "<thead><tr>" >> $HTML_FILE
+	
+	# Loop through column headers and add to table
+	HEADERS=$(head -n 1 "$file")
+	IFS=',' read -r -a HEADER_ARRAY <<< "$HEADERS"
+	for header in "${HEADER_ARRAY[@]}"
+	do
+		echo "<th>$header</th>" >> $HTML_FILE
+	done
+	
+	# Add table body to HTML file
+	echo "</tr></thead>" >> $HTML_FILE
+	echo "<tbody>" >> $HTML_FILE
+	
+	# Loop through CSV file and add rows to table
+	NUM_ROWS=$(wc -l < "$file")
+	NUM_ROWS=$((NUM_ROWS-1)) # Subtract 1 for the header row
+	while read line
+	do
+		echo "<tr style='color:$CELL_TEXT_COLOR; background-color:$ROW_COLOR_1;'><td>${line//,/</td><td>}</td></tr>" | sed 's/;/<br>/g' >> $HTML_FILE
+		ROW_COLOR_TEMP=$ROW_COLOR_1
+		ROW_COLOR_1=$ROW_COLOR_2
+		ROW_COLOR_2=$ROW_COLOR_TEMP
+	done < <(tail -n +2 "$file")
+	
+	# Close the table
+	echo "</tbody></table>" >> $HTML_FILE
+done
+
+
 #####################
 # Completion Prompt #
 #####################
 
-# Let the user know everything is finished and ask to open the reports folder
+# Let the user know everything is finished and open the reports folder
 IBMcomplete="-type popup -title \"Jamf Scrape Complete\" -subtitle \"Click OK to open your reports directory.\" -main_button_label \"OK\""
 IBMcommand="$IBMpath $IBMcomplete"
 complete=$(echo $IBMcommand | sh)
 open $outputDirectory/Reports
+
 
 exit 0

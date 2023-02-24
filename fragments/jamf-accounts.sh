@@ -28,6 +28,7 @@ current_date=$(date +%Y-%m-%d)
 if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory
 	mkdir $outputDirectory/XML
+	mkdir $outputDirectory/CSV
 	mkdir $outputDirectory/Reports
 fi
 
@@ -47,7 +48,7 @@ fi
 curl -H "Accept: application/xml" -u "$api_username:$api_password" "$accounts_endpoint" | xmllint --format - > $outputDirectory/XML/jamf_access_accounts.xml
 
 # Create headers for the CSV file
-echo "Username,Full Name,Email Address,Status,Access Level,Directory User,Privilege Set" > $outputDirectory/Reports/jamf_access_accounts_$current_date.csv
+echo "Username,Full Name,Email Address,Status,Access Level,Directory User,Privilege Set" > $outputDirectory/CSV/jamf_access_accounts_$current_date.csv
 
 # Get a list of all account IDs
 account_ids=`xmllint --xpath "//user/id/text()" $outputDirectory/XML/jamf_access_accounts.xml | tr '\n' ' '`
@@ -63,7 +64,7 @@ for id in $account_ids; do
 	access=`echo "$account_info" | xmllint --xpath "//account/access_level/text()" -`
 	directory=`echo "$account_info" | xmllint --xpath "//account/directory_user/text()" -`
 	privilege_set=`echo "$account_info" | xmllint --xpath "//account/privilege_set/text()" -`
-	echo "$account_name,$account_fullname,$account_email,$status,$access,$directory,$privilege_set" >> $outputDirectory/Reports/jamf_access_accounts_$current_date.csv
+	echo "$account_name,$account_fullname,$account_email,$status,$access,$directory,$privilege_set" >> $outputDirectory/CSV/jamf_access_accounts_$current_date.csv
 	echo $account_info | xmllint --format - > "$outputDirectory/XML/Access_Accounts/AccountID_$id-$account_name.xml"
 done
 
@@ -75,7 +76,7 @@ done
 group_ids=`xmllint --xpath "//group/id/text()" $outputDirectory/XML/jamf_access_accounts.xml | tr '\n' ' '`
 
 # Create headers for the CSV file
-echo "Group,Access Level,LDAP Server,Privilege Set" > $outputDirectory/Reports/jamf_access_groups_$current_date.csv
+echo "Group,Access Level,LDAP Server,Privilege Set" > $outputDirectory/CSV/jamf_access_groups_$current_date.csv
 
 # Loop through each group ID
 for id in $group_ids; do
@@ -85,6 +86,6 @@ for id in $group_ids; do
 	access=`echo "$group_info" | xmllint --xpath "//group/access_level/text()" -`
 	ldap_server=`echo "$group_info" | xmllint --xpath "//group/ldap_server/name/text()" -`
 	privilege_set=`echo "$group_info" | xmllint --xpath "//group/privilege_set/text()" -`
-	echo "$group_name,$access,$ldap_server,$privilege_set" >> $outputDirectory/Reports/jamf_access_groups_$current_date.csv
+	echo "$group_name,$access,$ldap_server,$privilege_set" >> $outputDirectory/CSV/jamf_access_groups_$current_date.csv
 	echo $group_info | xmllint --format - > "$outputDirectory/XML/Access_Groups/GroupID_$id-$group_name.xml"
 done

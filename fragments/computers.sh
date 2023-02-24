@@ -28,6 +28,7 @@ current_date=$(date +%Y-%m-%d)
 if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory
 	mkdir $outputDirectory/XML
+	mkdir $outputDirectory/CSV
 	mkdir $outputDirectory/Reports
 fi
 
@@ -43,7 +44,7 @@ fi
 curl -H "Accept: application/xml" -u "$api_username:$api_password" "$computers_endpoint" | xmllint --format - > $outputDirectory/XML/computers.xml
 
 # Create headers for the CSV file
-echo "Computer Name,Serial Number,Model,User,Department,Building,Room,OS Version,Enrolled Via DEP,MDM Capable,Last Check-In Time,Site" > $outputDirectory/Reports/computers_$current_date.csv
+echo "Computer Name,Serial Number,Model,User,Department,Building,Room,OS Version,Enrolled Via DEP,MDM Capable,Last Check-In Time,Site,Group Memberships" > $outputDirectory/CSV/computers_$current_date.csv
 
 # Get a list of all computer IDs
 computer_ids=`xmllint --xpath "//id/text()" $outputDirectory/XML/computers.xml | tr '\n' ' '`
@@ -64,6 +65,7 @@ for id in $computer_ids; do
 	mdm_capable=`echo "$computer_info" | xmllint --xpath "//computer/general/mdm_capable/text()" -`
 	os_version=`echo "$computer_info" | xmllint --xpath "//computer/hardware/os_version/text()" -`
 	model=`echo "$computer_info" | xmllint --xpath "//computer/hardware/model/text()" - | tr "," " "` 
-	echo "$computer_name,$serial_number,$model,$user,$department,$building,$room,$os_version,$enrolled_via_dep,$mdm_capable,$checkin_time,$site" >> $outputDirectory/Reports/computers_$current_date.csv
+	computer_groups=`echo "$computer_info" | xmllint --xpath "//computer/groups_accounts/computer_group_memberships/group/text()" - | tr '\n' ";" | tr "," " "`
+	echo "$computer_name,$serial_number,$model,$user,$department,$building,$room,$os_version,$enrolled_via_dep,$mdm_capable,$checkin_time,$site,$computer_groups" >> $outputDirectory/CSV/computers_$current_date.csv
 	echo $computer_info | xmllint --format - > $outputDirectory/XML/Computers/computerID_$id-SN_$serial_number.xml
 done
