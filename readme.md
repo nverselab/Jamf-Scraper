@@ -13,6 +13,8 @@ permissions.
 This script will make an API call for each object ID it finds.  In large environments this may result
 in hundreds or thousands of calls and will take a long time to complete.  Please be patient.
 
+![Alt text](https://nverselab.com/wp-content/uploads/2023/02/jamfscraper_report_screenshot.png)
+
 # Prerequisits
 
 * Jamf Pro Account with Auditor or equivalent permissions
