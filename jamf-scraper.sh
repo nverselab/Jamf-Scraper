@@ -54,7 +54,7 @@
 # v0.3.0-a - 02/19/2023 - Implimented prompts for variable input and report selections with IBM Notifier
 # v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
 #                       - Added group memberships for computers and devices.
-# v0.4.1*a * 02/24/2023 - Added Licesned and VPP/App Store Reports
+# v0.4.1-a - 02/24/2023 - Added Licensed and VPP/App Store Reports
 #
 ####################################################################################################
 #
@@ -297,8 +297,17 @@ echo "<div class='menu'>" >> $HTML_FILE
 echo "<a class='menu-link'>Jump to: </a>" >> $HTML_FILE
 for file in $CSV_FOLDER/*.csv
 do
+	# Get table label from filename
 	TABLE_LABEL=$(basename "$file" .csv)
-	TABLE_LINKTEXT=`echo "${TABLE_LABEL}" | sed 's/...........$//'` # Remove the datestamp
+	
+	# Count number of rows in CSV file
+	NUM_ROWS=$(($(wc -l < "$file")-1))
+	
+	# Append row count to table label
+	TABLE_LABEL="$NUM_ROWS $TABLE_LABEL"
+	
+	# Remove the datestamp from the link text
+	TABLE_LINKTEXT=`echo "${TABLE_LABEL}" | sed 's/...........$//'` 
 	echo "<a class='menu-link' href='#$TABLE_LABEL'>$TABLE_LINKTEXT</a>" >> $HTML_FILE
 done
 

@@ -32,8 +32,8 @@ if [ ! -d "$outputDirectory" ]; then
 	mkdir $outputDirectory/Reports
 fi
 
-if [ ! -d "$outputDirectory/XML/VPP-AppStore_MacApps" ]; then
-	mkdir $outputDirectory/XML/VPP-AppStore_MacApps
+if [ ! -d "$outputDirectory/XML/VPP_MacApps" ]; then
+	mkdir $outputDirectory/XML/VPP_MacApps
 fi
 
 ############################
@@ -41,13 +41,13 @@ fi
 ############################
 
 # Export all VPP Software
-curl -H "Accept: application/xml" -u "$api_username:$api_password" "$macapplications_endpoint" | xmllint --format - > $outputDirectory/XML/VPP-AppStore_MacApps.xml
+curl -H "Accept: application/xml" -u "$api_username:$api_password" "$macapplications_endpoint" | xmllint --format - > $outputDirectory/XML/vpp_macapps.xml
 
 # Create headers for the CSV file
-echo "Software Name,Owned,Used,Remaining,Deployment,Device Based?,Bundle ID,AppStore URL,Category,Site,All Computers?,Computers,Computer Groups,All Users?" > $outputDirectory/CSV/VPP-AppStore_MacApps_$current_date.csv
+echo "Software Name,Owned,Used,Remaining,Deployment,Device Based?,Bundle ID,AppStore URL,Category,Site,All Computers?,Computers,Computer Groups,All Users?" > $outputDirectory/CSV/vpp_macapps_$current_date.csv
 
 # Get a list of all VPPsoftware IDs
-macapplication_ids=`xmllint --xpath "//mac_application/id/text()" $outputDirectory/XML/VPP-AppStore_MacApps.xml | tr '\n' ' '`
+macapplication_ids=`xmllint --xpath "//mac_application/id/text()" $outputDirectory/XML/vpp_macapps.xml | tr '\n' ' '`
 
 # Loop through each VPPsoftware ID
 for id in $macapplication_ids; do
@@ -82,6 +82,6 @@ for id in $macapplication_ids; do
 	allcomputers=`echo "$macapplication_info" | xmllint --xpath "//mac_application/scope/all_computers/text()" -`
 	allusers=`echo "$macapplication_info" | xmllint --xpath "//mac_application/scope/all_jss_users/text()" -`
 	computer_groups=`echo "$macapplication_info" | xmllint --xpath "//mac_application/scope/computer_groups/computer_group/name/text()" - | tr '\n' ";" | tr "," " "`
-	echo "$macapplication_name,$owned,$used,$remaining,$deployment,$devicebased,$bundleid,$url,$category,$site,$allcomputers,$computer_names,$computer_groups,$allusers" >> $outputDirectory/CSV/VPP-AppStore_MacApps_$current_date.csv
-	echo $macapplication_info | xmllint --format - > "$outputDirectory/XML/VPP-AppStore_MacApps/VPP-AppStore_AppID_$id-$macapplication_name.xml"
+	echo "$macapplication_name,$owned,$used,$remaining,$deployment,$devicebased,$bundleid,$url,$category,$site,$allcomputers,$computer_names,$computer_groups,$allusers" >> $outputDirectory/CSV/vpp_macapps_$current_date.csv
+	echo $macapplication_info | xmllint --format - > "$outputDirectory/XML/VPP_MacApps/VPP-AppStore_AppID_$id-$macapplication_name.xml"
 done
