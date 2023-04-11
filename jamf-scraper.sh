@@ -55,8 +55,10 @@
 # v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
 #                       - Added group memberships for computers and devices.
 # v0.4.1-a - 02/24/2023 - Added Licensed and VPP/App Store Report
-# v0.4.2-a - 04/11/2023 - Added Computer Profiles Report
-#						  Added Device Profiles Report
+# v0.4.2-a - 04/11/2023 - Added Configuration Profiles Reports (Computer and Device)
+#						  Added Extension Attributes Reports (Computer and Device)
+#						  Added Scripts Report
+#						  Customized default folder structure and combined report name and title to reflect the Jamf Pro subdomain.
 #
 ####################################################################################################
 #
@@ -226,6 +228,16 @@ result=$(echo $IBMcommand | sh)
 # Generate Folder Structure #
 #############################
 
+# Set instnaceName to the $base_url
+instanceName="$base_url"
+
+# Remove http:// or https:// if it exists
+instanceName="${instanceName#http://}"
+instanceName="${instanceName#https://}"
+
+# Remove all characters after and including the first period
+instanceName="${instanceName%%.*}"
+
 # Create the XML and Reports folder if it doesn't exist
 
 # Check to see if outputDirectory is specified and if not default to user's Desktop
@@ -238,7 +250,7 @@ if [[ -z "$outputDirectory" ]]; then
 	current_date=$(date +%Y-%m-%d)
 	
 	# Set outputDirectory to current user's Desktop
-	outputDirectory=/Users/$currentUser/Desktop/jamfScraper-Results_$current_date
+	outputDirectory=/Users/$currentUser/Desktop/$instanceName-Results_$current_date
 fi
 
 if [ ! -d "$outputDirectory" ]; then
@@ -268,7 +280,7 @@ done
 
 # Set variables
 CSV_FOLDER="$outputDirectory/CSV"
-HTML_FILE="$outputDirectory/Reports/Combined-Report_$current_date.html"
+HTML_FILE="$outputDirectory/Reports/$instanceName-Report_$current_date.html"
 ROW_COLOR_1="#F4F6F9"
 ROW_COLOR_2="#FFFFFF"
 HEADER_COLOR="#333333"
@@ -285,7 +297,7 @@ echo "<html><head>" > $HTML_FILE
 echo "<style>" >> $HTML_FILE
 echo "body { padding-top: calc($MENU_HEIGHT * 1.25); }" >> $HTML_FILE
 echo "a.menu-link { display: inline-block; color: $MENU_TEXT_COLOR; text-decoration: none; font-weight: bold; padding: 0 10px; line-height: 3; }" >> $HTML_FILE
-echo ".menu { position: fixed; top: 0; left: 0; right: 0; height: $MENU_HEIGHT; background-color: $MENU_BACKGROUND_COLOR; z-index: 9999; display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;}" >> $HTML_FILE
+echo ".menu { position: fixed; top: 0; left: 0; right: 0; height: $MENU_HEIGHT; background-color: $MENU_BACKGROUND_COLOR; z-index: 9999; display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap;}" >> $HTML_FILE
 echo "table {border-collapse: collapse; width: 100%;}" >> $HTML_FILE
 echo "th, td {text-align: left; padding: 8px;}" >> $HTML_FILE
 echo "th {background-color: $HEADER_COLOR; color: $HEADER_TEXT_COLOR; position: sticky; top: 50;}" >> $HTML_FILE
@@ -316,7 +328,7 @@ done
 echo "</div>" >> $HTML_FILE
 
 # Add Title to HTML File
-echo "<h1 style='color:$CELL_TEXT_COLOR'>Jamf Scraper - Combined Report</h1>" >> $HTML_FILE
+echo "<h1 style='color:$CELL_TEXT_COLOR'>$instanceName - Combined Report</h1>" >> $HTML_FILE
 
 # Loop through CSV files
 for file in $CSV_FOLDER/*.csv
