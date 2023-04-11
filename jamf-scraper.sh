@@ -54,7 +54,9 @@
 # v0.3.0-a - 02/19/2023 - Implimented prompts for variable input and report selections with IBM Notifier
 # v0.4.0-a - 02/20/2023 - Added combined report with colors and formatting for multiple line cells.
 #                       - Added group memberships for computers and devices.
-# v0.4.1-a - 02/24/2023 - Added Licensed and VPP/App Store Reports
+# v0.4.1-a - 02/24/2023 - Added Licensed and VPP/App Store Report
+# v0.4.2-a - 04/11/2023 - Added Computer Profiles Report
+#						  Added Device Profiles Report
 #
 ####################################################################################################
 #
