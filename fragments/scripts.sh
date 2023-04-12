@@ -57,8 +57,8 @@ for id in $script_ids; do
 	category=`echo "$script_info" | xmllint --xpath "//script/category/text()" -`
 	filename=`echo "$script_info" | xmllint --xpath "//script/filename/text()" - | tr "," " " | tr ";" " "`
 	priority=`echo "$script_info" | xmllint --xpath "//script/priority/text()" -`
-	info=`echo "$script_info" | xmllint --xpath "//script/info/text()" - | tr "," " " | tr ";" " "`
-	notes=`echo "$script_info" | xmllint --xpath "//script/notes/text()" - | tr "," " " | tr ";" " "`
+	info=`echo "$script_info" | xmllint --xpath "//script/info/text()" - | tr "," " " | tr ";" " " | tr '\n' ";"`
+	notes=`echo "$script_info" | xmllint --xpath "//script/notes/text()" - | tr "," " " | tr ";" " " | tr '\n' ";"`
 	echo "$script_name,$category,$filename,$priority,$info,$notes" >> $outputDirectory/CSV/scripts_$current_date.csv
 	echo $script_info | xmllint --format - > "$outputDirectory/XML/scripts/scriptID_$id-$script_name.xml"
 done

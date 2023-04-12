@@ -59,6 +59,7 @@
 #						  Added Extension Attributes Reports (Computer and Device)
 #						  Added Scripts Report
 #						  Customized default folder structure and combined report name and title to reflect the Jamf Pro subdomain.
+# v0.4.3-a - 04/12/2023 - Fixed Room attributes issue (#5) where new line characters started new rows in the CSV and HTML report.
 #
 ####################################################################################################
 #

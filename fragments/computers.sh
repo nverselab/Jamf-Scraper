@@ -57,8 +57,8 @@ for id in $computer_ids; do
 	serial_number=`echo "$computer_info" | xmllint --xpath "//computer/general/serial_number/text()" -`
 	user=`echo "$computer_info" | xmllint --xpath "//computer/location/username/text()" -`
 	building=`echo "$computer_info" | xmllint --xpath "//computer/location/building/text()" -`
-	room=`echo "$computer_info" | xmllint --xpath "//computer/location/room/text()" -`
-	department=`echo "$computer_info" | xmllint --xpath "//computer/location/department/text()" -`
+	room=`echo "$computer_info" | xmllint --xpath "//computer/location/room/text()" - | tr '\n' ";" | tr "," " "`
+	department=`echo "$computer_info" | xmllint --xpath "//computer/location/department/text()" - | tr '\n' ";" | tr "," " "`
 	site=`echo "$computer_info" | xmllint --xpath "//computer/general/site/name/text()" -`
 	checkin_time=`echo "$computer_info" | xmllint --xpath "//computer/general/last_contact_time/text()" -`
 	enrolled_via_dep=`echo "$computer_info" | xmllint --xpath "//computer/general/management_status/enrolled_via_dep/text()" -`

@@ -56,8 +56,8 @@ for id in $device_ids; do
 	device_name=`echo "$device_info" | xmllint --xpath "//mobile_device/general/name/text()" -`
 	serial_number=`echo "$device_info" | xmllint --xpath "//mobile_device/general/serial_number/text()" -`
 	user=`echo "$device_info" | xmllint --xpath "//mobile_device/location/username/text()" -`
-	building=`echo "$device_info" | xmllint --xpath "//mobile_device/location/building/text()" -`
-	room=`echo "$device_info" | xmllint --xpath "//mobile_device/location/room/text()" -`
+	building=`echo "$device_info" | xmllint --xpath "//mobile_device/location/building/text()" - | tr '\n' ";" | tr "," " "`
+	room=`echo "$device_info" | xmllint --xpath "//mobile_device/location/room/text()" - | tr '\n' ";" | tr "," " "`
 	department=`echo "$device_info" | xmllint --xpath "//mobile_device/location/department/text()" -`
 	site=`echo "$device_info" | xmllint --xpath "//mobile_device/general/site/name/text()" -`
 	inventory_time=`echo "$device_info" | xmllint --xpath "//mobile_device/general/last_inventory_update/text()" - | tr "," " "`
