@@ -1,5 +1,7 @@
 # Description
 
+Note: Jamf is depreciating user/password authentication for API. It may be some time before I come back and revise this tool, but feel free to build on it and improve it to fit your needs.
+
 The purpose of this script is to create a custom report of inventory data from Jamf Pro for
 reporting, auditing, or archiving records as they exist at runtime.  Inventory object data is pulled
 with the Jamf Pro API, formatted, and stored in the XML folder in the directory where the script was run.
